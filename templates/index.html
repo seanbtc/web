@@ -28,6 +28,27 @@
             .content-auto { content-visibility: auto; }
             .card-hover { @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1; }
             .btn-primary { @apply bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors; }
+            .table-container {
+                max-height: 400px;
+                overflow-y: auto;
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #e5e7eb;
+            }
+            .table-container::-webkit-scrollbar {
+                width: 8px;
+            }
+            .table-container::-webkit-scrollbar-track {
+                background: #e5e7eb;
+                border-radius: 4px;
+            }
+            .table-container::-webkit-scrollbar-thumb {
+                background-color: #3b82f6;
+                border-radius: 4px;
+                border: 2px solid #e5e7eb;
+            }
+            .table-container::-webkit-scrollbar-thumb:hover {
+                background-color: #2563eb;
+            }
         }
         body {
             font-size: 0.8rem;
@@ -63,18 +84,21 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row items-start md:items-center">
+        <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row items-start md:items-center justify-between">
             <div class="flex items-center mb-3 md:mb-0">
                 <div class="flex items-center mr-6">
-                    <span class="text-sm font-semibold text-gray-700 mr-2">市场周期:</span>
+                    <span class="text-sm font-semibold text-gray-700 mr-2">比特币周期:</span>
                     <span class="px-3 py-1 rounded-full text-sm font-semibold flex items-center" id="market-cycle">
                         <i class="fa fa-arrow-down mr-1"></i> 熊
                     </span>
                 </div>
                 <div class="flex items-center">
-                    <span class="text-sm font-semibold text-gray-700 mr-2">BTC价格:</span>
+                    <span class="text-sm font-semibold text-gray-700 mr-2">价格:</span>
                     <span class="text-sm font-bold text-dark" id="btc-price">$68,000.00</span>
                 </div>
+            </div>
+            <div class="flex items-center">
+                <div class="text-sm font-semibold text-gray-700" id="current-time"></div>
             </div>
         </div>
     </header>
@@ -125,9 +149,31 @@
                 </div>
             </div>
             
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <h4 class="text-lg font-semibold text-dark mb-4">4H多空策略盈亏</h4>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">本金</div>
+                        <div class="text-lg font-bold text-dark" id="tradingview-initial-funds">1000.00 USDT</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">收益</div>
+                        <div class="text-lg font-bold text-green-600" id="tradingview-total-profit">0.00 USDT</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">收益率</div>
+                        <div class="text-lg font-bold text-green-600" id="tradingview-return-rate">0.00%</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">胜率</div>
+                        <div class="text-lg font-bold text-green-600" id="tradingview-win-rate">0.00%</div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h4 class="text-lg font-semibold text-dark mb-4">4H多空策略交易记录</h4>
-                <div class="overflow-x-auto">
+                <div class="table-container overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
@@ -144,7 +190,10 @@
                                     价格
                                 </th>
                                 <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    信号
+                                    交易类型
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    盈亏
                                 </th>
                                 <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     时间
@@ -153,7 +202,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200" id="tradingview-tbody">
                             <tr>
-                                <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                                <td colspan="7" class="px-3 py-4 text-center text-gray-500">
                                     <i class="fa fa-info-circle text-lg mb-1"></i>
                                     <p>暂无交易记录</p>
                                 </td>
@@ -181,7 +230,7 @@
             </div>
             
             <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                <h4 class="text-lg font-semibold text-dark mb-4">套利策略盈亏摘要</h4>
+                <h4 class="text-lg font-semibold text-dark mb-4">套利策略盈亏</h4>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div class="bg-gray-50 rounded-lg p-3">
                         <div class="text-xs text-gray-500 mb-1">初始总资金</div>
@@ -199,11 +248,14 @@
             </div>
             
             <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-dark mb-4">套利策略交易记录</h4>
-                <div class="overflow-x-auto">
+                <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
+                <div class="table-container overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    时间
+                                </th>
                                 <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     交易对
                                 </th>
@@ -211,7 +263,7 @@
                                     方向
                                 </th>
                                 <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    数量
+                                    USDT价值
                                 </th>
                                 <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     开仓价格
@@ -262,7 +314,7 @@
                     </div>
                     <div class="bg-gray-50 rounded-lg p-3">
                         <div class="text-xs text-gray-500 mb-1">当前仓位数量</div>
-                        <div class="text-md font-bold text-dark" id="top-bottom-quantity"> BTC</div>
+                        <div class="text-md font-bold text-dark" id="top-bottom-quantity"> </div>
                     </div>
                     <div class="bg-gray-50 rounded-lg p-3">
                         <div class="text-xs text-gray-500 mb-1">当前仓位均价</div>
@@ -275,7 +327,7 @@
                 </div>
                 
                 <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
-                <div class="overflow-x-auto">
+                <div class="table-container overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
@@ -349,7 +401,7 @@
                 </div>
                 
                 <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
-                <div class="overflow-x-auto">
+                <div class="table-container overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
@@ -427,13 +479,19 @@
         // WebSocket连接
         const socket = io();
         
+        // 全局变量，用于存储当前显示的记录数量
+        let tradingViewDisplayCount = 5;
+        let arbitrageDisplayCount = 5;
+        let topBottomDisplayCount = 5;
+        let spotDisplayCount = 5;
+        
         // 更新TradingView交易记录表格
         function updateTradingViewTable(data) {
             const tbody = document.getElementById('tradingview-tbody');
             if (data.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                             <i class="fa fa-info-circle text-2xl mb-2"></i>
                             <p>暂无交易记录</p>
                         </td>
@@ -442,17 +500,41 @@
                 return;
             }
             
+            // 按时间戳排序，最新的记录在前面
+            const sortedData = [...data].sort((a, b) => {
+                // 确保时间戳格式正确
+                const timeA = a.timestamp ? new Date(a.timestamp.replace(/-/g, '/')) : 0;
+                const timeB = b.timestamp ? new Date(b.timestamp.replace(/-/g, '/')) : 0;
+                return timeB - timeA;
+            });
+            
+            // 显示指定数量的记录
+            const displayData = sortedData.slice(0, tradingViewDisplayCount);
+            
             tbody.innerHTML = '';
-            data.forEach(trade => {
+            displayData.forEach(trade => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50';
                 const symbol = trade.symbol || '-';
                 const side = trade.side || '未知';
                 const quantity = trade.quantity || 0;
                 const price = trade.price || 0;
-                const alertMessage = trade.alert_message ? trade.alert_message.substring(0, 40) + (trade.alert_message.length > 40 ? '...' : '') : '';
+                const tradeType = trade.trade_type || '未知';
+                // 计算盈亏
+                let profit = 0;
+                if (tradeType === '止盈' || tradeType === '止损' || tradeType === '平仓') {
+                    // 对于止盈、止损和平仓，使用总盈亏数据
+                    profit = parseFloat(trade.total_profit) || 0;
+                }
                 const timestamp = trade.timestamp || '';
                 const sideClass = (side === 'BUY') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                const tradeTypeClass = {
+                    '开仓': 'bg-blue-100 text-blue-800',
+                    '止盈': 'bg-green-100 text-green-800',
+                    '止损': 'bg-red-100 text-red-800',
+                    '平仓': 'bg-yellow-100 text-yellow-800',
+                    '未知': 'bg-gray-100 text-gray-800'
+                }[tradeType] || 'bg-gray-100 text-gray-800';
                 tr.innerHTML = `
                     <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">${symbol}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm">
@@ -462,11 +544,35 @@
                     </td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${quantity}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${price}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${alertMessage}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm">
+                        <span class="px-1.5 inline-flex text-xs leading-4 font-semibold rounded-full ${tradeTypeClass}">
+                            ${tradeType}
+                        </span>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-${profit >= 0 ? 'green-600' : 'red-600'}">${profit.toFixed(2)} USDT</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${timestamp}</td>
                 `;
                 tbody.appendChild(tr);
             });
+            
+            // 添加加载更多按钮
+            if (data.length > tradingViewDisplayCount && tradingViewDisplayCount < 20) {
+                const loadMoreRow = document.createElement('tr');
+                loadMoreRow.innerHTML = `
+                    <td colspan="7" class="px-6 py-4 text-center">
+                        <button id="load-more-tradingview" class="text-primary hover:underline text-sm font-medium">
+                            加载更多记录
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(loadMoreRow);
+                
+                // 添加点击事件
+                document.getElementById('load-more-tradingview').addEventListener('click', function() {
+                    tradingViewDisplayCount = Math.min(tradingViewDisplayCount + 5, 20);
+                    updateTradingViewTable(data);
+                });
+            }
         }
         
         // 更新套利策略交易记录表格
@@ -482,14 +588,15 @@
                     quantity: detail.open_executed_qty || 0,
                     open_price: detail.open_avg_price || 0,
                     close_price: detail.close_avg_price || 0,
-                    net_profit: detail.net_profit || 0
+                    net_profit: detail.net_profit || 0,
+                    timestamp: detail.open_time_cn || ''
                 }));
             }
             
             if (tradeRecords.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                             <i class="fa fa-info-circle text-2xl mb-2"></i>
                             <p>暂无交易记录</p>
                         </td>
@@ -498,8 +605,19 @@
                 return;
             }
             
+            // 按时间戳排序，最新的记录在前面
+            const sortedTradeRecords = [...tradeRecords].sort((a, b) => {
+                // 确保时间戳格式正确
+                const timeA = a.timestamp ? new Date(a.timestamp.replace(/-/g, '/')) : 0;
+                const timeB = b.timestamp ? new Date(b.timestamp.replace(/-/g, '/')) : 0;
+                return timeB - timeA;
+            });
+            
+            // 显示指定数量的记录
+            const displayTradeRecords = sortedTradeRecords.slice(0, arbitrageDisplayCount);
+            
             tbody.innerHTML = '';
-            tradeRecords.forEach(trade => {
+            displayTradeRecords.forEach(trade => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50';
                 
@@ -507,63 +625,54 @@
                 const openSide = trade.open_side || '未知';
                 const sideClass = (openSide === 'BUY') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
                 
-                // 处理数量显示
-                const quantity = trade.quantity || 0;
-                
                 // 处理价格显示
                 const openPrice = trade.open_price || 0;
                 const closePrice = trade.close_price || 0;
+                
+                // 计算USDT价值
+                const quantity = trade.quantity || 0;
+                const usdtValue = (quantity * openPrice).toFixed(4);
                 
                 // 处理净收益显示
                 const netProfit = trade.net_profit || 0;
                 const profitClass = (netProfit >= 0) ? 'green-600' : 'red-600';
                 
                 tr.innerHTML = `
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${trade.timestamp || '-'}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">${trade.symbol || '-'}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm">
                         <span class="px-1.5 inline-flex text-xs leading-4 font-semibold rounded-full ${sideClass}">
                             ${openSide}
                         </span>
                     </td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${quantity}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${usdtValue} USDT</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${openPrice}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${closePrice}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-${profitClass}">${netProfit} USDT</td>
                 `;
                 tbody.appendChild(tr);
             });
-        }
-        
-        // 更新交易对连续盈利次数
-        function updateSymbolProfitTracker(data) {
-            const container = document.getElementById('symbol-profit-tracker');
-            // 检查容器是否存在
-            if (!container) return;
             
-            const symbolProfitTracker = data.symbol_profit_tracker || {};
-            if (Object.keys(symbolProfitTracker).length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-8 text-gray-500">
-                        <i class="fa fa-info-circle text-2xl mb-2"></i>
-                        <p>暂无交易对连续盈利数据</p>
-                    </div>
+            // 添加加载更多按钮
+            if (tradeRecords.length > arbitrageDisplayCount && arbitrageDisplayCount < 20) {
+                const loadMoreRow = document.createElement('tr');
+                loadMoreRow.innerHTML = `
+                    <td colspan="7" class="px-6 py-4 text-center">
+                        <button id="load-more-arbitrage" class="text-primary hover:underline text-sm font-medium">
+                            加载更多记录
+                        </button>
+                    </td>
                 `;
-                return;
+                tbody.appendChild(loadMoreRow);
+                
+                // 添加点击事件
+                document.getElementById('load-more-arbitrage').addEventListener('click', function() {
+                    arbitrageDisplayCount = Math.min(arbitrageDisplayCount + 5, 20);
+                    updateArbitrageTable(data);
+                });
             }
-            
-            container.innerHTML = '';
-            Object.entries(symbolProfitTracker).forEach(([symbol, count]) => {
-                const div = document.createElement('div');
-                div.className = 'bg-gray-50 rounded-lg p-4';
-                div.innerHTML = `
-                    <div class="text-sm font-medium text-gray-500 mb-1">${symbol}</div>
-                    <div class="text-xl font-bold text-primary">${count}</div>
-                    <div class="text-xs text-gray-500">连续盈利次数</div>
-                `;
-                container.appendChild(div);
-            });
         }
-        
+       
         // 更新套利策略盈亏摘要
         function updateArbitrageSummary(data) {
             // 检查数据结构，处理两种可能的格式
@@ -581,10 +690,46 @@
             document.getElementById('arbitrage-total-return-rate').textContent = totalReturnRate;
         }
         
+        // 更新TradingView策略盈亏摘要
+        function updateTradingViewSummary(data) {
+            // 从数据中提取必要的信息
+            const winTrades = data.win_trades || 0;
+            const loseTrades = data.lose_trades || 0;
+            const totalProfit = data.total_profit || 0;
+            const initialFunds = data.initial_funds || 1000.0;
+            
+            // 计算胜率
+            const totalTrades = winTrades + loseTrades;
+            const winRate = totalTrades > 0 ? (winTrades / totalTrades) * 100 : 0;
+            
+            // 计算总收益率
+            const returnRate = initialFunds > 0 ? (totalProfit / initialFunds) * 100 : 0;
+            
+            // 更新TradingView策略模块中的盈亏摘要
+            document.getElementById('tradingview-total-profit').textContent = totalProfit.toFixed(4) + ' USDT';
+            document.getElementById('tradingview-return-rate').textContent = returnRate.toFixed(4) + '%';
+            document.getElementById('tradingview-win-rate').textContent = winRate.toFixed(4) + '%';
+            document.getElementById('tradingview-initial-funds').textContent = initialFunds.toFixed(4) + ' USDT';
+        }
+        
         // 更新顶部策略盈亏摘要
         function updateTopSummary(data) {
+            // 检查数据是否存在
+            if (!data) {
+                console.error('数据不存在');
+                return;
+            }
+            
+            console.log('总盈亏数据:', data.total_profit);
+            
+            if (!data.total_profit) {
+                console.error('总盈亏数据不存在');
+                return;
+            }
+            
             // 使用总盈亏数据
-            const totalProfitSummary = data.total_profit.profit_summary || {};
+            const totalProfitSummary = data.total_profit.profit_summary || data.total_profit;
+            console.log('总盈亏摘要数据:', totalProfitSummary);
             
             // 处理总收益率，确保显示为百分比格式
             let totalReturnRate = totalProfitSummary.total_return_rate || 0;
@@ -667,7 +812,7 @@
             // 检查data是否存在
             if (!data) return;
             
-            // 检查数据结构，top_bottom可能是直接在根级别
+            // 检查数据结构，top_bottom是正确的键名
             const topBottomData = data.top_bottom || data;
             
             if (!topBottomData) return;
@@ -700,7 +845,7 @@
         // 更新摸顶抄底策略交易记录表格
         function updateTopBottomTable(data) {
             const tbody = document.getElementById('top-bottom-tbody');
-            // 检查数据结构，top_bottom可能是直接在根级别
+            // 检查数据结构，top_bottom是正确的键名
             const topBottomData = data.top_bottom || data;
             const tradeRecords = topBottomData.trade_records || [];
             
@@ -716,8 +861,19 @@
                 return;
             }
             
+            // 按时间戳排序，最新的记录在前面
+            const sortedTradeRecords = [...tradeRecords].sort((a, b) => {
+                // 确保时间戳格式正确
+                const timeA = a.timestamp ? new Date(a.timestamp.replace(/-/g, '/')) : 0;
+                const timeB = b.timestamp ? new Date(b.timestamp.replace(/-/g, '/')) : 0;
+                return timeB - timeA;
+            });
+            
+            // 显示指定数量的记录
+            const displayTradeRecords = sortedTradeRecords.slice(0, topBottomDisplayCount);
+            
             tbody.innerHTML = '';
-            tradeRecords.forEach(trade => {
+            displayTradeRecords.forEach(trade => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50';
                 tr.innerHTML = `
@@ -739,6 +895,25 @@
                 `;
                 tbody.appendChild(tr);
             });
+            
+            // 添加加载更多按钮
+            if (tradeRecords.length > topBottomDisplayCount && topBottomDisplayCount < 20) {
+                const loadMoreRow = document.createElement('tr');
+                loadMoreRow.innerHTML = `
+                    <td colspan="7" class="px-6 py-4 text-center">
+                        <button id="load-more-top-bottom" class="text-primary hover:underline text-sm font-medium">
+                            加载更多记录
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(loadMoreRow);
+                
+                // 添加点击事件
+                document.getElementById('load-more-top-bottom').addEventListener('click', function() {
+                    topBottomDisplayCount = Math.min(topBottomDisplayCount + 5, 20);
+                    updateTopBottomTable(data);
+                });
+            }
         }
         
         // 计算浮盈
@@ -862,8 +1037,19 @@
                 return;
             }
             
+            // 按时间戳排序，最新的记录在前面
+            const sortedTradeRecords = [...tradeRecords].sort((a, b) => {
+                // 确保时间戳格式正确
+                const timeA = a.timestamp ? new Date(a.timestamp.replace(/-/g, '/')) : 0;
+                const timeB = b.timestamp ? new Date(b.timestamp.replace(/-/g, '/')) : 0;
+                return timeB - timeA;
+            });
+            
+            // 显示指定数量的记录
+            const displayTradeRecords = sortedTradeRecords.slice(0, spotDisplayCount);
+            
             tbody.innerHTML = '';
-            tradeRecords.forEach(trade => {
+            displayTradeRecords.forEach(trade => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50';
                 tr.innerHTML = `
@@ -880,6 +1066,25 @@
                 `;
                 tbody.appendChild(tr);
             });
+            
+            // 添加加载更多按钮
+            if (tradeRecords.length > spotDisplayCount && spotDisplayCount < 20) {
+                const loadMoreRow = document.createElement('tr');
+                loadMoreRow.innerHTML = `
+                    <td colspan="6" class="px-6 py-4 text-center">
+                        <button id="load-more-spot" class="text-primary hover:underline text-sm font-medium">
+                            加载更多记录
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(loadMoreRow);
+                
+                // 添加点击事件
+                document.getElementById('load-more-spot').addEventListener('click', function() {
+                    spotDisplayCount = Math.min(spotDisplayCount + 5, 20);
+                    updateSpotTable(data);
+                });
+            }
         }
         
         // 定期获取BTC价格
@@ -915,6 +1120,27 @@
                 });
         }
         
+        // 更新当前时间
+        function updateCurrentTime() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('current-time').textContent = now.toLocaleString('zh-CN', options);
+        }
+        
+        // 每1秒更新一次时间
+        setInterval(updateCurrentTime, 1000);
+        
+        // 页面加载时更新时间
+        window.addEventListener('load', updateCurrentTime);
+        
         // 每30秒更新一次BTC价格
         setInterval(fetchBtcPrice, 30000);
         
@@ -924,9 +1150,9 @@
         // 接收数据更新
         socket.on('all_data', function(data) {
             updateTradingViewTable(data.tradingview);
+            updateTradingViewSummary(data.tradingview_summary || {});
             updateArbitrageTable(data.arbitrage);
             updateArbitrageSummary(data.arbitrage);
-            updateSymbolProfitTracker(data.arbitrage);
             updateStrategyStatus(data);
             updateMarketData(data);
             updateTopBottomData(data);
@@ -943,9 +1169,9 @@
                 .then(data => {
                     console.log('初始数据:', data);
                     updateTradingViewTable(data.tradingview);
+                    updateTradingViewSummary(data.tradingview_summary || {});
                     updateArbitrageTable(data.arbitrage);
                     updateArbitrageSummary(data.arbitrage);
-                    updateSymbolProfitTracker(data.arbitrage);
                     updateStrategyStatus(data);
                     updateMarketData(data);
                     updateTopBottomData(data);

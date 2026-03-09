@@ -61,14 +61,78 @@ def load_total_profit_data():
         'symbol_profit_tracker': {}
     }
 
+# 从本地文件读取套利策略数据
+def load_arbitrage_data():
+    file_path = os.path.join(data_dir, 'arbitrage_trades.json')
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data
+        except Exception as e:
+            print(f"读取套利策略数据失败: {e}")
+    return {
+        'profit_summary': {
+            'total_net_profit': 0.0,
+            'total_margin': 0.0,
+            'total_return_rate': 0.0,
+            'yearly_return_rate': 0.0,
+            'yearly_return_profit': 0.0,
+            'initial_funds': 0.0
+        },
+        'trade_records': [],
+        'symbol_loss_tracker': {}
+    }
+
+# 保存套利策略数据到本地文件
+def save_arbitrage_data(data):
+    file_path = os.path.join(data_dir, 'arbitrage_trades.json')
+    try:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print("套利策略数据已保存")
+    except Exception as e:
+        print(f"保存套利策略数据失败: {e}")
+
+# 从本地文件读取TradingView策略数据
+def load_tradingview_data():
+    file_path = os.path.join(data_dir, 'tradingview_trades.json')
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data
+        except Exception as e:
+            print(f"读取TradingView策略数据失败: {e}")
+    return {'trade_records': [], 'summary': {
+        'win_trades': 0,
+        'lose_trades': 0,
+        'total_profit': 0.0,
+        'initial_funds': 1000.0
+    }}
+
+# 保存TradingView策略数据到本地文件
+def save_tradingview_data(data):
+    file_path = os.path.join(data_dir, 'tradingview_trades.json')
+    try:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print("TradingView策略数据已保存")
+    except Exception as e:
+        print(f"保存TradingView策略数据失败: {e}")
+
 # 定期检查文件更新的函数
 def check_file_updates():
     top_bottom_file_path = os.path.join(data_dir, 'top_bottom_trades.json')
     spot_file_path = os.path.join(data_dir, 'spot_trades.json')
     total_profit_file_path = os.path.join(data_dir, 'total_profit.json')
+    arbitrage_file_path = os.path.join(data_dir, 'arbitrage_trades.json')
+    tradingview_file_path = os.path.join(data_dir, 'tradingview_trades.json')
     last_modified_top_bottom = 0
     last_modified_spot = 0
     last_modified_total_profit = 0
+    last_modified_arbitrage = 0
+    last_modified_tradingview = 0
     
     while True:
         try:
@@ -123,6 +187,40 @@ def check_file_updates():
                     socketio.emit('all_data', data_storage.get_all_data())
                     print("总仓盈亏数据已更新")
             
+            # 检查套利策略数据文件
+            if os.path.exists(arbitrage_file_path):
+                current_modified = os.path.getmtime(arbitrage_file_path)
+                if current_modified > last_modified_arbitrage:
+                    last_modified_arbitrage = current_modified
+                    # 重新加载数据
+                    new_data = load_arbitrage_data()
+                    # 更新套利策略数据
+                    data_storage.arbitrage_data = new_data
+                    data_storage.update_global_data()
+                    # 广播更新
+                    socketio.emit('all_data', data_storage.get_all_data())
+                    print("套利策略数据已更新")
+            
+            # 检查TradingView策略数据文件
+            if os.path.exists(tradingview_file_path):
+                current_modified = os.path.getmtime(tradingview_file_path)
+                if current_modified > last_modified_tradingview:
+                    last_modified_tradingview = current_modified
+                    # 重新加载数据
+                    new_data = load_tradingview_data()
+                    # 更新TradingView策略数据
+                    data_storage.tradingview_data = new_data.get('trade_records', [])
+                    data_storage.tradingview_summary = new_data.get('summary', {
+                        'win_trades': 0,
+                        'lose_trades': 0,
+                        'total_profit': 0.0,
+                        'initial_funds': 1000.0
+                    })
+                    data_storage.update_global_data()
+                    # 广播更新
+                    socketio.emit('all_data', data_storage.get_all_data())
+                    print("TradingView策略数据已更新")
+            
             # 每5秒检查一次
             time.sleep(5)
         except Exception as e:
@@ -136,23 +234,21 @@ top_bottom_file_data = load_top_bottom_data()
 spot_file_data = load_spot_data()
 # 加载总仓盈亏数据
 total_profit_data = load_total_profit_data()
-# 初始化套利策略数据
-arbitrage_data = {
-    'profit_summary': {
-        'total_net_profit': 0.0,
-        'total_margin': 0.0,
-        'total_return_rate': 0.0,
-        'yearly_return_rate': 0.0,
-        'yearly_return_profit': 0.0,
-        'initial_funds': 0.0
-    },
-    'trade_records': [],
-    'trade_details': [],
-    'symbol_profit_tracker': {}
-}
+# 加载套利策略数据
+arbitrage_data = load_arbitrage_data()
+# 加载TradingView策略数据
+tradingview_data = load_tradingview_data()
+tradingview_trade_records = tradingview_data.get('trade_records', [])
+tradingview_summary = tradingview_data.get('summary', {
+    'win_trades': 0,
+    'lose_trades': 0,
+    'total_profit': 0.0,
+    'initial_funds': 1000.0
+})
 
 global_data = {
-    'tradingview_data': [],  # TradingView交易数据
+    'tradingview': tradingview_trade_records,  # TradingView交易数据
+    'tradingview_summary': tradingview_summary,  # TradingView策略盈亏摘要
     'arbitrage_data': arbitrage_data,  # 套利策略数据
     'total_profit_data': total_profit_data,  # 总仓盈亏数据
     'top_bottom_data': {
@@ -183,7 +279,8 @@ global_data = {
 # 数据存储类
 class DataStorage:
     def __init__(self):
-        self.tradingview_data = global_data['tradingview_data']
+        self.tradingview_data = global_data['tradingview']
+        self.tradingview_summary = global_data['tradingview_summary']
         self.arbitrage_data = global_data['arbitrage_data']
         self.total_profit_data = global_data['total_profit_data']
         self.top_bottom_data = global_data['top_bottom_data']
@@ -193,7 +290,8 @@ class DataStorage:
     
     def update_global_data(self):
         global global_data
-        global_data['tradingview_data'] = self.tradingview_data
+        global_data['tradingview'] = self.tradingview_data
+        global_data['tradingview_summary'] = self.tradingview_summary
         global_data['arbitrage_data'] = self.arbitrage_data
         global_data['total_profit_data'] = self.total_profit_data
         global_data['top_bottom_data'] = self.top_bottom_data
@@ -202,33 +300,50 @@ class DataStorage:
         global_data['market_data'] = self.market_data
     
     def add_tradingview_trade(self, trade_data):
-        trade_data['timestamp'] = datetime.now().isoformat()
+        trade_data['timestamp'] = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         # 插入到列表开头，实现时间从近到远显示
         self.tradingview_data.insert(0, trade_data)
         # 限制存储的记录数量
         if len(self.tradingview_data) > 100:
             self.tradingview_data = self.tradingview_data[:100]
+        
+        # 更新tradingview_summary数据
+        if 'win_trades' in trade_data:
+            self.tradingview_summary['win_trades'] = trade_data['win_trades']
+        if 'lose_trades' in trade_data:
+            self.tradingview_summary['lose_trades'] = trade_data['lose_trades']
+        if 'total_profit' in trade_data:
+            self.tradingview_summary['total_profit'] = trade_data['total_profit']
+        if 'initial_funds' in trade_data:
+            self.tradingview_summary['initial_funds'] = trade_data['initial_funds']
+        
         self.update_global_data()
+        # 保存TradingView策略数据到本地文件
+        save_tradingview_data({
+            'trade_records': self.tradingview_data,
+            'summary': self.tradingview_summary
+        })
     
     def update_arbitrage_data(self, data):
         if 'profit_summary' in data:
-            # 只保留需要的字段，排除round_net_profit
-            profit_summary = data['profit_summary']
-            filtered_summary = {
-                'total_net_profit': profit_summary.get('total_net_profit', 0.0),
-                'total_margin': profit_summary.get('total_margin', 1000.0),
-                'total_return_rate': profit_summary.get('total_return_rate', 0.0),
-                'yearly_return_rate': profit_summary.get('yearly_return_rate', profit_summary.get('round_return_rate', 0.0)),
-                'yearly_return_profit': profit_summary.get('yearly_return_profit', profit_summary.get('total_net_profit', 0.0))
-            }
-            self.arbitrage_data['profit_summary'] = filtered_summary
+            # 直接使用传过来的profit_summary数据，不做处理
+            self.arbitrage_data['profit_summary'] = data['profit_summary']
         if 'trade_records' in data:
-            self.arbitrage_data['trade_records'] = data['trade_records']
-        if 'trade_details' in data:
-            self.arbitrage_data['trade_details'] = data['trade_details']
-        if 'symbol_profit_tracker' in data:
-            self.arbitrage_data['symbol_profit_tracker'] = data['symbol_profit_tracker']
+            # 为每条交易记录添加时间戳
+            new_records = data['trade_records']
+            for record in new_records:
+                if 'timestamp' not in record:
+                    record['timestamp'] = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+            # 将新记录添加到现有列表中，而不是替换整个列表
+            self.arbitrage_data['trade_records'].extend(new_records)
+            # 限制存储的记录数量，保持文件大小合理
+            if len(self.arbitrage_data['trade_records']) > 100:
+                self.arbitrage_data['trade_records'] = self.arbitrage_data['trade_records'][-100:]
+        if 'symbol_loss_tracker' in data:
+            self.arbitrage_data['symbol_loss_tracker'] = data['symbol_loss_tracker']
         self.update_global_data()
+        # 保存套利策略数据到本地文件
+        save_arbitrage_data(self.arbitrage_data)
     
     def update_strategy_status(self, strategy, status):
         if strategy in self.strategy_status:
@@ -267,11 +382,11 @@ class DataStorage:
                 return False
         
         # 添加时间戳
-        trade_data['timestamp'] = datetime.now().isoformat()
+        trade_data['timestamp'] = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         
         # 如果已平仓，添加平仓时间戳
         if trade_data.get('is_closed'):
-            trade_data['close_timestamp'] = trade_data.get('close_timestamp', datetime.now().isoformat())
+            trade_data['close_timestamp'] = trade_data.get('close_timestamp', datetime.now().strftime('%Y-%m-%d-%H:%M:%S'))
         
         # 插入到列表开头，实现时间从近到远显示
         self.top_bottom_data['trade_records'].insert(0, trade_data)
@@ -303,11 +418,11 @@ class DataStorage:
                 return False
         
         # 添加时间戳
-        trade_data['timestamp'] = datetime.now().isoformat()
+        trade_data['timestamp'] = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
         
         # 如果已平仓，添加平仓时间戳
         if trade_data.get('is_closed'):
-            trade_data['close_timestamp'] = trade_data.get('close_timestamp', datetime.now().isoformat())
+            trade_data['close_timestamp'] = trade_data.get('close_timestamp', datetime.now().strftime('%Y-%m-%d-%H:%M:%S'))
         
         # 插入到列表开头，实现时间从近到远显示
         self.spot_data['trade_records'].insert(0, trade_data)
@@ -322,6 +437,7 @@ class DataStorage:
     def get_all_data(self):
         return {
             'tradingview': self.tradingview_data,
+            'tradingview_summary': self.tradingview_summary,
             'arbitrage': self.arbitrage_data,
             'total_profit': self.total_profit_data,
             'top_bottom': self.top_bottom_data,
