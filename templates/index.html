@@ -113,12 +113,12 @@
         <!-- 策略盈亏摘要 -->
         <section class="mb-12">
             <div class="bg-white rounded-xl shadow-md p-6">
-                <h3 class="text-xl font-semibold text-dark mb-4">策略盈亏摘要</h3>
+                <h3 class="text-xl font-semibold text-dark mb-4">交易系统总盈亏</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
                     <!-- 隐藏当前总资金 -->
                     <div class="bg-gray-50 rounded-lg p-3">
                         <div class="text-xs text-gray-500 mb-1">累计净收益</div>
-                        <div class="text-lg font-bold text-green-600" id="total-net-profit">0.00 USD</div>
+                        <div class="text-lg font-bold text-green-600" id="total-net-profit">$0.00</div>
                     </div>
                     <div class="bg-gray-50 rounded-lg p-3">
                         <div class="text-xs text-gray-500 mb-1">总收益率</div>
@@ -130,7 +130,7 @@
                     </div>
                      <div class="bg-gray-50 rounded-lg p-3">
                         <div class="text-xs text-gray-500 mb-1">本年净收益</div>
-                        <div class="text-lg font-bold text-green-600" id="yearly-return-profit">0.00 USD</div>
+                        <div class="text-lg font-bold text-green-600" id="yearly-return-profit">$0.00</div>
                     </div>
                 </div>
                 
@@ -169,37 +169,49 @@
                     </div>
                     <h3 class="text-lg font-semibold text-dark">4H多空策略</h3>
                 </div>
-                <p class="text-gray-600 mb-3">TradingView策略,做多/做空</p>
+                <p class="text-gray-600 mb-3">趋势波段策略</p>
                 <div class="flex items-center mb-4">
                     <span class="text-xs font-medium text-gray-500 mr-2">状态:</span>
                     <span class="px-2 py-1 rounded-full text-xs font-semibold" id="tradingview-status">做空</span>
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                <h4 class="text-lg font-semibold text-dark mb-4">策略盈亏</h4>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">本金</div>
-                        <div class="text-lg font-bold text-dark" id="tradingview-initial-funds">1000.00 USD</div>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-1">
+                    <h4 class="text-lg font-semibold text-dark mb-4">策略总盈亏</h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">收益</div>
+                            <div class="text-lg font-bold text-green-600" id="tradingview-all-total-profit">$0.00</div>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">收益</div>
-                        <div class="text-lg font-bold text-green-600" id="tradingview-total-profit">0.00 USD</div>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">收益率</div>
-                        <div class="text-lg font-bold text-green-600" id="tradingview-return-rate">0.00%</div>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">胜率</div>
-                        <div class="text-lg font-bold text-green-600" id="tradingview-win-rate">0.00%</div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-4">
+                    <h4 class="text-lg font-semibold text-dark mb-4">本轮盈亏#1.5</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">本金</div>
+                            <div class="text-lg font-bold text-dark" id="tradingview-initial-funds">$1000.00</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">收益</div>
+                            <div class="text-lg font-bold text-green-600" id="tradingview-total-profit">$0.00</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">收益率</div>
+                            <div class="text-lg font-bold text-green-600" id="tradingview-return-rate">0.00%</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">胜率</div>
+                            <div class="text-lg font-bold text-green-600" id="tradingview-win-rate">100.0%</div>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-dark mb-4">4H多空策略交易记录</h4>
+                <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
                 <div class="table-container overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
@@ -235,6 +247,47 @@
                     </table>
                 </div>
             </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 mt-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                    <h4 class="text-lg font-semibold text-dark">过去几轮盈利记录</h4>
+                    
+                </div>
+                <div class="table-container overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    标识
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    方向
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    本金
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    盈亏
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    收益率
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    时间跨度
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="tradingview-round-tbody">
+                            <tr>
+                                <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                                    <i class="fa fa-info-circle text-lg mb-1"></i>
+                                    <p>暂无过去几轮盈利记录</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </section>
 
         <!-- 摸顶抄底策略模块 -->
@@ -253,27 +306,41 @@
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-dark mb-3">当前持仓状态</h4>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">当前仓位状态</div>
-                        <div class="text-md font-bold text-dark" id="top-bottom-status-display">做空</div>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">当前仓位数量</div>
-                        <div class="text-md font-bold text-dark" id="top-bottom-quantity"> </div>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">当前仓位均价</div>
-                        <div class="text-md font-bold text-dark" id="top-bottom-avg-price"> USD</div>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">浮盈</div>
-                        <div class="text-md font-bold" id="top-bottom-float-profit">0.00 USD</div>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-1">
+                    <h4 class="text-lg font-semibold text-dark mb-4">策略总盈亏</h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">收益</div>
+                            <div class="text-lg font-bold text-green-600" id="top-bottom-total-profit">$0.00</div>
+                        </div>
                     </div>
                 </div>
-                
+
+                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-4">
+                    <h4 class="text-lg font-semibold text-dark mb-3">本轮持仓</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">当前仓位状态</div>
+                            <div class="text-md font-bold text-dark" id="top-bottom-status-display">做空</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">当前仓位数量</div>
+                            <div class="text-md font-bold text-dark" id="top-bottom-quantity"> </div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">当前仓位均价</div>
+                            <div class="text-md font-bold text-dark" id="top-bottom-avg-price">$</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">浮盈</div>
+                            <div class="text-md font-bold" id="top-bottom-float-profit">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6">
                 <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
                 <div class="table-container overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -331,23 +398,37 @@
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-dark mb-3">当前持仓状态</h4>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">当前仓位数量</div>
-                        <div class="text-md font-bold text-dark" id="spot-quantity"> BTC</div>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">当前仓位均价</div>
-                        <div class="text-md font-bold text-dark" id="spot-avg-price"> USD</div>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">浮盈</div>
-                        <div class="text-md font-bold" id="spot-float-profit">0.00 USD</div>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-1">
+                    <h4 class="text-lg font-semibold text-dark mb-4">策略总盈亏</h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">收益</div>
+                            <div class="text-lg font-bold text-green-600" id="spot-total-profit">$0.00</div>
+                        </div>
                     </div>
                 </div>
-                
+
+                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-4">
+                    <h4 class="text-lg font-semibold text-dark mb-3">本轮持仓</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">当前仓位数量</div>
+                            <div class="text-md font-bold text-dark" id="spot-quantity"> BTC</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">当前仓位均价</div>
+                            <div class="text-md font-bold text-dark" id="spot-avg-price">$</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">浮盈</div>
+                            <div class="text-md font-bold" id="spot-float-profit">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6">
                 <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
                 <div class="table-container overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -403,16 +484,16 @@
             </div>
             
             <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                <h4 class="text-lg font-semibold text-dark mb-4">策略盈亏</h4>
+                <h4 class="text-lg font-semibold text-dark mb-4">本轮盈亏</h4>
                 <p class="text-gray-600 mb-3" id="arbitrage-start-time">2026年3月11日 至今</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div class="bg-gray-50 rounded-lg p-3">
                         <div class="text-xs text-gray-500 mb-1">初始总资金</div>
-                        <div class="text-lg font-bold text-dark" id="arbitrage-initial-funds">1000.00 USD</div>
+                        <div class="text-lg font-bold text-dark" id="arbitrage-initial-funds">$1000.00</div>
                     </div>
                     <div class="bg-gray-50 rounded-lg p-3">
                         <div class="text-xs text-gray-500 mb-1">累计净收益</div>
-                        <div class="text-lg font-bold text-green-600" id="arbitrage-total-net-profit">0.00 USD</div>
+                        <div class="text-lg font-bold text-green-600" id="arbitrage-total-net-profit">$0.00</div>
                     </div>
                     <div class="bg-gray-50 rounded-lg p-3">
                         <div class="text-xs text-gray-500 mb-1">累计总收益率</div>
@@ -437,7 +518,7 @@
                                     方向
                                 </th>
                                 <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    USD价值
+                                    价值($)
                                 </th>
                                 <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     开仓价格
@@ -507,6 +588,7 @@
         
         // 全局变量，用于存储当前显示的记录数量
         let tradingViewDisplayCount = 5;
+        let tradingViewRoundDisplayCount = 5;
         let arbitrageDisplayCount = 5;
         let topBottomDisplayCount = 5;
         let spotDisplayCount = 5;
@@ -566,11 +648,12 @@
             
             // 更新TradingView策略数据
             if (data.tradingview_summary) {
-                updateTradingViewSummary(data.tradingview_summary);
+                updateTradingViewSummary(data.tradingview_summary, data.tradingview_rounds || []);
             }
             if (data.tradingview) {
                 updateTradingViewTable(data.tradingview);
             }
+            updateTradingViewRoundTable(data.tradingview_rounds || [], data.tradingview_summary?.initial_funds || 0);
             
             // 更新摸顶抄底策略数据
             updateTopBottomData(data);
@@ -669,6 +752,95 @@
                 });
             }
         }
+
+        // 更新TradingView过去几轮盈利记录表格
+        function updateTradingViewRoundTable(data, defaultPrincipal = 0) {
+            const tbody = document.getElementById('tradingview-round-tbody');
+            if (!tbody) {
+                return;
+            }
+
+            if (!Array.isArray(data) || data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                            <i class="fa fa-info-circle text-2xl mb-2"></i>
+                            <p>暂无过去几轮盈利记录</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const sortedData = [...data].sort((a, b) => {
+                const timeA = (a.end_time || a.timestamp || '').replace(/-/g, '/');
+                const timeB = (b.end_time || b.timestamp || '').replace(/-/g, '/');
+                return new Date(timeB) - new Date(timeA);
+            });
+
+            const displayData = sortedData.slice(0, tradingViewRoundDisplayCount);
+            tbody.innerHTML = '';
+
+            displayData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50';
+
+                const identifier = item.identifier || item.id || item.label || '-';
+                const directionRaw = String(item.direction || '-').toUpperCase();
+                let direction = item.direction || '-';
+                if (['BUY', 'LONG', '多', '做多'].includes(directionRaw) || ['多', '做多'].includes(item.direction)) {
+                    direction = '做多';
+                } else if (['SELL', 'SHORT', '空', '做空'].includes(directionRaw) || ['空', '做空'].includes(item.direction)) {
+                    direction = '做空';
+                }
+
+                const pnl = Number(item.pnl ?? item.profit ?? 0);
+                const principal = Number(item.principal ?? item.initial_funds ?? defaultPrincipal ?? 0);
+                const hasPrincipal = principal > 0;
+                const returnRate = hasPrincipal ? (pnl / principal) * 100 : null;
+                const timespan = item.timespan || item.time_span || item.duration || '-';
+
+                const directionClass = direction === '做多'
+                    ? 'bg-green-100 text-green-800'
+                    : direction === '做空'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-800';
+
+                const pnlClass = pnl >= 0 ? 'text-green-600' : 'text-red-600';
+                const pnlPrefix = pnl >= 0 ? '+' : '';
+                const returnClass = returnRate !== null && returnRate < 0 ? 'text-red-600' : 'text-green-600';
+                const returnPrefix = returnRate !== null && returnRate >= 0 ? '+' : '';
+
+                tr.innerHTML = `
+                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">${identifier}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm">
+                        <span class="px-1.5 inline-flex text-xs leading-4 font-semibold rounded-full ${directionClass}">${direction}</span>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${hasPrincipal ? ('$' + principal.toFixed(1)) : '-'}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium ${pnlClass}">${pnlPrefix}$${pnl.toFixed(1)}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium ${returnClass}">${returnRate !== null ? (returnPrefix + returnRate.toFixed(2) + '%') : '-'}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${timespan}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (data.length > tradingViewRoundDisplayCount && tradingViewRoundDisplayCount < 20) {
+                const loadMoreRow = document.createElement('tr');
+                loadMoreRow.innerHTML = `
+                    <td colspan="6" class="px-6 py-4 text-center">
+                        <button id="load-more-tradingview-round" class="text-primary hover:underline text-sm font-medium">
+                            加载更多记录
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(loadMoreRow);
+
+                document.getElementById('load-more-tradingview-round').addEventListener('click', function() {
+                    tradingViewRoundDisplayCount = Math.min(tradingViewRoundDisplayCount + 5, 20);
+                    updateTradingViewRoundTable(data, defaultPrincipal);
+                });
+            }
+        }
         
         // 更新套利策略交易记录表格
         function updateArbitrageTable(data) {
@@ -712,9 +884,9 @@
                 const openPrice = trade.open_price || 0;
                 const closePrice = trade.close_price || 0;
                 
-                // 计算USD价值
+                // 计算价值
                 const quantity = trade.quantity || 0;
-                const usdtValue = (quantity * openPrice).toFixed(1);
+                const amountValue = (quantity * openPrice).toFixed(1);
                 
                 // 处理净收益显示
                 const netProfit = trade.net_profit || 0;
@@ -728,10 +900,10 @@
                             ${openSide}
                         </span>
                     </td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${usdtValue} USD</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">$${amountValue}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${openPrice}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${closePrice}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-${profitClass}">${netProfit} USD</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-${profitClass}">$${netProfit}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -768,17 +940,21 @@
             }
             
             // 更新套利策略模块中的盈亏摘要
-            document.getElementById('arbitrage-initial-funds').textContent = (summary.initial_funds || 1000.0) + ' USD';
-            document.getElementById('arbitrage-total-net-profit').textContent = (summary.total_net_profit || 0).toFixed(1) + ' USD';
+            document.getElementById('arbitrage-initial-funds').textContent = '$' + (summary.initial_funds || 1000.0);
+            document.getElementById('arbitrage-total-net-profit').textContent = '$' + (summary.total_net_profit || 0).toFixed(1);
             document.getElementById('arbitrage-total-return-rate').textContent = totalReturnRate;
         }
         
         // 更新TradingView策略盈亏摘要
-        function updateTradingViewSummary(data) {
+        function updateTradingViewSummary(data, roundRecords = []) {
             // 从数据中提取必要的信息
             const winTrades = data.win_trades || 0;
             const loseTrades = data.lose_trades || 0;
-            const totalProfit = data.total_profit || 0;
+            const totalProfit = Number(data.total_profit || 0);
+            const roundsProfitSum = Array.isArray(roundRecords)
+                ? roundRecords.reduce((sum, item) => sum + Number(item?.pnl ?? item?.profit ?? 0), 0)
+                : 0;
+            const totalProfitAll = totalProfit + roundsProfitSum;
             const initialFunds = data.initial_funds || 1000.0;
             
             // 计算胜率
@@ -787,12 +963,20 @@
             
             // 计算总收益率
             const returnRate = initialFunds > 0 ? (totalProfit / initialFunds) * 100 : 0;
+
+            // 更新总策略盈亏模块
+            const totalProfitAllEl = document.getElementById('tradingview-all-total-profit');
+            if (totalProfitAllEl) {
+                totalProfitAllEl.textContent = '$' + totalProfitAll.toFixed(1);
+                totalProfitAllEl.classList.remove('text-green-600', 'text-red-600');
+                totalProfitAllEl.classList.add(totalProfitAll >= 0 ? 'text-green-600' : 'text-red-600');
+            }
             
             // 更新TradingView策略模块中的盈亏摘要
-            document.getElementById('tradingview-total-profit').textContent = totalProfit.toFixed(1) + ' USD';
+            document.getElementById('tradingview-total-profit').textContent = '$' + totalProfit.toFixed(1);
             document.getElementById('tradingview-return-rate').textContent = returnRate.toFixed(1) + '%';
             document.getElementById('tradingview-win-rate').textContent = winRate.toFixed(1) + '%';
-            document.getElementById('tradingview-initial-funds').textContent = initialFunds.toFixed(1) + ' USD';
+            document.getElementById('tradingview-initial-funds').textContent = '$' + initialFunds.toFixed(1);
         }
         
         // 更新顶部策略盈亏摘要
@@ -874,10 +1058,10 @@
             }
             
             // 隐藏当前总资金，不再更新
-            document.getElementById('total-net-profit').textContent = Math.round(totalNetProfit) + ' USD';
+            document.getElementById('total-net-profit').textContent = '$' + Math.round(totalNetProfit);
             document.getElementById('total-return-rate').textContent = totalReturnRate;
             document.getElementById('yearly-return-rate').textContent = yearlyReturnRate;
-            document.getElementById('yearly-return-profit').textContent = Math.round(yearlyReturnProfit) + ' USD';
+            document.getElementById('yearly-return-profit').textContent = '$' + Math.round(yearlyReturnProfit);
         }
         
         // 更新策略状态
@@ -951,6 +1135,16 @@
             if (!topBottomData) return;
             
             console.log('摸顶抄底数据:', topBottomData);
+
+            // 更新总策略盈亏（累计交易记录盈亏）
+            const topBottomTotalProfit = (topBottomData.trade_records || []).reduce((sum, trade) => {
+                return sum + (parseFloat(trade.profit) || 0);
+            }, 0);
+            const topBottomTotalProfitElement = document.getElementById('top-bottom-total-profit');
+            if (topBottomTotalProfitElement) {
+                topBottomTotalProfitElement.textContent = '$' + topBottomTotalProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                topBottomTotalProfitElement.className = 'text-lg font-bold ' + (topBottomTotalProfit >= 0 ? 'text-green-600' : 'text-red-600');
+            }
             
             // 更新仓位状态
             const statusElement = document.getElementById('top-bottom-status-display');
@@ -968,7 +1162,7 @@
             const avgPriceElement = document.getElementById('top-bottom-avg-price');
             if (avgPriceElement) {
                 const avgPrice = parseFloat(topBottomData.position_avg_price) || 0;
-                avgPriceElement.textContent = avgPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' USD';
+                avgPriceElement.textContent = '$' + avgPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
             
             // 计算并更新浮盈
@@ -1017,14 +1211,14 @@
                         </span>
                     </td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${trade.quantity || 0} BTC</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${(parseFloat(trade.avg_price) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">$${(parseFloat(trade.avg_price) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm">
                         <span class="px-1.5 inline-flex text-xs leading-4 font-semibold rounded-full ${trade.is_closed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
                             ${trade.is_closed ? '已平仓' : '未平仓'}
                         </span>
                     </td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${trade.close_timestamp || '-'}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-${(parseFloat(trade.profit) >= 0) ? 'green-600' : 'red-600'}">${(parseFloat(trade.profit) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-${(parseFloat(trade.profit) >= 0) ? 'green-600' : 'red-600'}">$${(parseFloat(trade.profit) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1078,7 +1272,7 @@
             // 更新浮盈显示
             const floatProfitElement = document.getElementById('top-bottom-float-profit');
             if (floatProfitElement) {
-                floatProfitElement.textContent = floatProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' USD';
+                floatProfitElement.textContent = '$' + floatProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 
                 // 根据浮盈正负设置颜色
                 floatProfitElement.className = 'text-md font-bold';
@@ -1110,7 +1304,7 @@
             // 更新浮盈显示
             const floatProfitElement = document.getElementById('spot-float-profit');
             if (floatProfitElement) {
-                floatProfitElement.textContent = floatProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' USD';
+                floatProfitElement.textContent = '$' + floatProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 
                 // 根据浮盈正负设置颜色
                 floatProfitElement.className = 'text-md font-bold';
@@ -1133,6 +1327,23 @@
             if (!spotData) return;
             
             console.log('现货策略数据:', spotData);
+
+            // 更新总策略盈亏：优先使用 total_profit_history 最新值，否则回退为交易记录累计盈亏。
+            let spotTotalProfit = 0;
+            if (Array.isArray(spotData.total_profit_history) && spotData.total_profit_history.length > 0) {
+                const latest = spotData.total_profit_history[spotData.total_profit_history.length - 1];
+                spotTotalProfit = parseFloat(latest.total_profit) || 0;
+            } else {
+                spotTotalProfit = (spotData.trade_records || []).reduce((sum, trade) => {
+                    return sum + (parseFloat(trade.profit) || 0);
+                }, 0);
+            }
+
+            const spotTotalProfitElement = document.getElementById('spot-total-profit');
+            if (spotTotalProfitElement) {
+                spotTotalProfitElement.textContent = '$' + spotTotalProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                spotTotalProfitElement.className = 'text-lg font-bold ' + (spotTotalProfit >= 0 ? 'text-green-600' : 'text-red-600');
+            }
             
             // 更新仓位数量
             const quantityElement = document.getElementById('spot-quantity');
@@ -1144,7 +1355,7 @@
             const avgPriceElement = document.getElementById('spot-avg-price');
             if (avgPriceElement) {
                 const avgPrice = parseFloat(spotData.position_avg_price) || 0;
-                avgPriceElement.textContent = avgPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' USD';
+                avgPriceElement.textContent = '$' + avgPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
             
             // 计算并更新浮盈
@@ -1188,14 +1399,14 @@
                 tr.innerHTML = `
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${trade.timestamp || '-'}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${trade.quantity || 0} BTC</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${(parseFloat(trade.avg_price) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">$${(parseFloat(trade.avg_price) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm">
                         <span class="px-1.5 inline-flex text-xs leading-4 font-semibold rounded-full ${trade.is_closed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
                             ${trade.is_closed ? '已平仓' : '未平仓'}
                         </span>
                     </td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${trade.close_timestamp || '-'}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-${(parseFloat(trade.profit) >= 0) ? 'green-600' : 'red-600'}">${(parseFloat(trade.profit) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-${(parseFloat(trade.profit) >= 0) ? 'green-600' : 'red-600'}">$${(parseFloat(trade.profit) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1302,7 +1513,7 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: '本金 (USD)',
+                            label: '本金 ($)',
                             data: principalData,
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -1314,7 +1525,7 @@
                             pointStyle: 'line'
                         },
                         {
-                            label: '总资金 (USD)',
+                            label: '总资金 ($)',
                             data: totalFundsData,
                             borderColor: '#10b981',
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -1359,7 +1570,7 @@
                                         if (context.dataset.yAxisID === 'y1') {
                                             label += context.parsed.y.toFixed(1) + '%';
                                         } else {
-                                            label += Math.round(context.parsed.y) + ' USD';
+                                            label += '$' + Math.round(context.parsed.y);
                                         }
                                     }
                                     return label;
@@ -1374,7 +1585,7 @@
                             position: 'left',
                             title: {
                                 display: true,
-                                text: '资金 (USD)'
+                                text: '资金 ($)'
                             },
                             ticks: {
                                 callback: function(value) {
@@ -1476,7 +1687,7 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: '本金 (USD)',
+                            label: '本金 ($)',
                             data: principalData,
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -1488,7 +1699,7 @@
                             pointStyle: 'line'
                         },
                         {
-                            label: '总资金 (USD)',
+                            label: '总资金 ($)',
                             data: totalFundsData,
                             borderColor: '#10b981',
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -1533,7 +1744,7 @@
                                         if (context.dataset.yAxisID === 'y1') {
                                             label += context.parsed.y.toFixed(1) + '%';
                                         } else {
-                                            label += Math.round(context.parsed.y) + ' USD';
+                                            label += '$' + Math.round(context.parsed.y);
                                         }
                                     }
                                     return label;
@@ -1548,7 +1759,7 @@
                             position: 'left',
                             title: {
                                 display: true,
-                                text: '资金 (USD)'
+                                text: '资金 ($)'
                             },
                             ticks: {
                                 callback: function(value) {
@@ -1580,7 +1791,8 @@
                 .then(data => {
                     console.log('初始数据:', data);
                     updateTradingViewTable(data.tradingview);
-                    updateTradingViewSummary(data.tradingview_summary || {});
+                    updateTradingViewRoundTable(data.tradingview_rounds || [], data.tradingview_summary?.initial_funds || 0);
+                    updateTradingViewSummary(data.tradingview_summary || {}, data.tradingview_rounds || []);
                     updateArbitrageTable(data.arbitrage);
                     updateArbitrageSummary(data.arbitrage);
                     updateStrategyStatus(data);

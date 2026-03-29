@@ -2,6 +2,8 @@ from flask import Flask, render_template, jsonify, request, send_from_directory
 import os
 import json
 import requests
+import logging
+import sys
 from datetime import datetime
 import threading
 import time
@@ -123,10 +125,11 @@ def load_tradingview_data():
                 return data
         except Exception as e:
             print(f"读取TradingView策略数据失败: {e}")
-    return {'trade_records': [], 'summary': {
+    return {'trade_records': [], 'round_records': [], 'summary': {
         'win_trades': 0,
         'lose_trades': 0,
         'total_profit': 0.0,
+        'total_profit_all': 0.0,
         'initial_funds': 1000.0
     }}
 
@@ -249,10 +252,12 @@ def check_file_updates():
                     new_data = load_tradingview_data()
                     # 更新TradingView策略数据
                     data_storage.tradingview_data = new_data.get('trade_records', [])
+                    data_storage.tradingview_rounds = new_data.get('round_records', [])
                     data_storage.tradingview_summary = new_data.get('summary', {
                         'win_trades': 0,
                         'lose_trades': 0,
                         'total_profit': 0.0,
+                        'total_profit_all': 0.0,
                         'initial_funds': 1000.0
                     })
                     data_storage.update_global_data()
@@ -292,10 +297,12 @@ arbitrage_data = load_arbitrage_data()
 # 加载TradingView策略数据
 tradingview_data = load_tradingview_data()
 tradingview_trade_records = tradingview_data.get('trade_records', [])
+tradingview_round_records = tradingview_data.get('round_records', [])
 tradingview_summary = tradingview_data.get('summary', {
     'win_trades': 0,
     'lose_trades': 0,
     'total_profit': 0.0,
+    'total_profit_all': 0.0,
     'initial_funds': 1000.0
 })
 
@@ -316,7 +323,7 @@ def fetch_btc_price():
                     data_storage.update_market_data({'btc_price': btc_price})
                     # 广播更新
                     socketio.emit('all_data', data_storage.get_all_data())
-                    print(f"BTC价格更新: ${btc_price}")
+                    # print(f"BTC价格更新: ${btc_price}")
             else:
                 # 如果Binance API失败，尝试使用CoinGecko API
                 response = requests.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', timeout=3)
@@ -328,7 +335,7 @@ def fetch_btc_price():
                         data_storage.update_market_data({'btc_price': btc_price})
                         # 广播更新
                         socketio.emit('all_data', data_storage.get_all_data())
-                        print(f"BTC价格更新 (CoinGecko): ${btc_price}")
+                        # print(f"BTC价格更新 (CoinGecko): ${btc_price}")
         except Exception as e:
             print(f"获取BTC价格失败: {e}")
         # 每30秒获取一次价格
@@ -336,6 +343,7 @@ def fetch_btc_price():
 
 global_data = {
     'tradingview': tradingview_trade_records,  # TradingView交易数据
+    'tradingview_rounds': tradingview_round_records,  # TradingView过去几轮盈利记录
     'tradingview_summary': tradingview_summary,  # TradingView策略盈亏摘要
     'arbitrage_data': arbitrage_data,  # 套利策略数据
     'total_profit_data': total_profit_data,  # 总仓盈亏数据
@@ -368,6 +376,7 @@ global_data = {
 class DataStorage:
     def __init__(self):
         self.tradingview_data = global_data['tradingview']
+        self.tradingview_rounds = global_data.get('tradingview_rounds', [])
         self.tradingview_summary = global_data['tradingview_summary']
         self.arbitrage_data = global_data['arbitrage_data']
         self.total_profit_data = global_data['total_profit_data']
@@ -380,6 +389,7 @@ class DataStorage:
     def update_global_data(self):
         global global_data
         global_data['tradingview'] = self.tradingview_data
+        global_data['tradingview_rounds'] = self.tradingview_rounds
         global_data['tradingview_summary'] = self.tradingview_summary
         global_data['arbitrage_data'] = self.arbitrage_data
         global_data['total_profit_data'] = self.total_profit_data
@@ -396,6 +406,14 @@ class DataStorage:
         # 限制存储的记录数量
         if len(self.tradingview_data) > 100:
             self.tradingview_data = self.tradingview_data[:100]
+
+        # 支持通过接口附带更新过去几轮盈利记录
+        if isinstance(trade_data.get('round_record'), dict):
+            self.tradingview_rounds.insert(0, trade_data['round_record'])
+        if isinstance(trade_data.get('round_records'), list):
+            self.tradingview_rounds = trade_data['round_records']
+        if len(self.tradingview_rounds) > 100:
+            self.tradingview_rounds = self.tradingview_rounds[:100]
         
         # 更新tradingview_summary数据
         if 'win_trades' in trade_data:
@@ -404,6 +422,8 @@ class DataStorage:
             self.tradingview_summary['lose_trades'] = trade_data['lose_trades']
         if 'total_profit' in trade_data:
             self.tradingview_summary['total_profit'] = trade_data['total_profit']
+        if 'total_profit_all' in trade_data:
+            self.tradingview_summary['total_profit_all'] = trade_data['total_profit_all']
         if 'initial_funds' in trade_data:
             self.tradingview_summary['initial_funds'] = trade_data['initial_funds']
         
@@ -411,6 +431,7 @@ class DataStorage:
         # 保存TradingView策略数据到本地文件
         save_tradingview_data({
             'trade_records': self.tradingview_data,
+            'round_records': self.tradingview_rounds,
             'summary': self.tradingview_summary
         })
     
@@ -441,68 +462,36 @@ class DataStorage:
                     except Exception as e:
                         print(f"⚠️ 保存套利策略起始时间异常：{e}")
         
-        # 处理盈亏数据累计
-        if 'profit_summary' in data:
-            # 先读取本地旧的累计值
-            old_profit = 0.0
-            if existing_data and 'profit_summary' in existing_data:
-                old_profit = existing_data['profit_summary'].get('total_net_profit', 0.0)
-            new_profit = data['profit_summary'].get('total_net_profit', 0.0)
-            # 如果新旧利润不一致且新利润不是累计值，则累加
-            if new_profit != 0.0 and old_profit != 0.0 and new_profit < old_profit:
-                # 传入的是本次增量利润，需累加
-                total_net_profit = old_profit + new_profit
-            else:
-                # 传入的是累计利润或首次
-                total_net_profit = new_profit if new_profit != 0.0 else old_profit
-            
-            # 获取初始资金
-            initial_funds = data['profit_summary'].get('initial_funds', 5000.0)
-            if not initial_funds or initial_funds <= 0:
-                # 如果没有初始资金或初始资金为0，使用旧数据或默认值
-                if existing_data and 'profit_summary' in existing_data:
-                    initial_funds = existing_data['profit_summary'].get('initial_funds', 5000.0)
-                else:
-                    initial_funds = 5000.0
-            
-            # 重新计算总保证金和总收益率
-            total_margin = initial_funds + total_net_profit
-            total_return_rate = (total_net_profit / initial_funds * 100) if initial_funds > 0 else 0
-            
-            # 构建利润摘要
-            profit_summary = data['profit_summary'].copy()
-            profit_summary['total_net_profit'] = total_net_profit
-            profit_summary['initial_funds'] = initial_funds
-            profit_summary['total_margin'] = total_margin
-            profit_summary['total_return_rate'] = total_return_rate
-            
-            # 兼容其他字段
-            for k in ['yearly_return_rate', 'yearly_return_profit']:
-                if k not in profit_summary:
-                    if existing_data and 'profit_summary' in existing_data and k in existing_data['profit_summary']:
-                        profit_summary[k] = existing_data['profit_summary'][k]
-            
-            self.arbitrage_data['profit_summary'] = profit_summary
-            print(f"✅ 套利策略盈亏数据已累计：总盈亏 {total_net_profit:.4f} USDT, 总保证金 {total_margin:.4f} USDT, 总收益率 {total_return_rate:.6f}%")
-        
+        # 处理交易记录和利润计算
+        def to_float(value, default=0.0):
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        trade_details = data.get('trade_details', [])
         new_records = []
-        if 'trade_details' in data:
-            trade_details = data['trade_details']
-            for detail in trade_details:
-                close_time = detail.get('close_time_cn', f"{datetime.now().timestamp()}")
-                order_id = f"{detail['symbol']}_{close_time}"
-                record = {
-                    'symbol': detail['symbol'],
-                    'open_side': detail.get('open_side', 'SELL'),
-                    'quantity': detail['open_executed_qty'],
-                    'open_price': detail['open_avg_price'],
-                    'close_price': detail['close_avg_price'],
-                    'net_profit': detail['net_profit'],
-                    'timestamp': detail['close_time_cn'],
-                    'order_id': order_id
-                }
-                new_records.append(record)
+        for detail in trade_details:
+            symbol = detail.get('symbol', 'UNKNOWN')
+            close_time = detail.get('close_time_cn', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            close_order_id = detail.get('close_order_id')
+            order_id = str(close_order_id) if close_order_id else f"{symbol}_{close_time}"
+            record = {
+                'symbol': symbol,
+                'open_side': detail.get('open_side', 'SELL'),
+                'quantity': to_float(detail.get('open_executed_qty', 0)),
+                'open_price': to_float(detail.get('open_avg_price', 0)),
+                'close_price': to_float(detail.get('close_avg_price', 0)),
+                'net_profit': to_float(detail.get('net_profit', 0)),
+                'timestamp': close_time,
+                'order_id': order_id
+            }
+            new_records.append(record)
+        
         # 去重处理：根据订单ID作为唯一标识符
+        added_records = 0
+        duplicate_records = 0
+        unique_new_records = []
         if new_records:
             existing_ids = set()
             for record in self.arbitrage_data['trade_records']:
@@ -512,10 +501,66 @@ class DataStorage:
                     record_id = f"{record.get('symbol', '')}_{record.get('timestamp', '')}_{record.get('open_price', '')}_{record.get('close_price', '')}_{record.get('net_profit', '')}_{record.get('quantity', '')}"
                     existing_ids.add(record_id)
             unique_new_records = [record for record in new_records if record['order_id'] not in existing_ids]
+            duplicate_records = len(new_records) - len(unique_new_records)
             if unique_new_records:
                 self.arbitrage_data['trade_records'].extend(unique_new_records)
+                added_records = len(unique_new_records)
                 if len(self.arbitrage_data['trade_records']) > 100:
                     self.arbitrage_data['trade_records'] = self.arbitrage_data['trade_records'][-100:]
+
+        # 只累计去重后的新增交易利润，避免重复请求导致利润重复计算
+        new_profit = sum(record.get('net_profit', 0.0) for record in unique_new_records)
+        
+        # 计算之前的总盈利
+        previous_total_profit = self.arbitrage_data['profit_summary'].get('total_net_profit', 0.0)
+        
+        # 计算总利润：如果有新添加的记录，使用之前的总盈利加上新交易的盈利；否则使用之前的总盈利
+        if added_records > 0:
+            total_net_profit = previous_total_profit + new_profit
+        else:
+            total_net_profit = previous_total_profit
+        
+        # 获取手动填写的初始资金
+        initial_funds = 500.0  # 默认值
+        if existing_data and 'profit_summary' in existing_data:
+            initial_funds = existing_data['profit_summary'].get('initial_funds', 500.0)
+        
+        # 计算总保证金和总收益率
+        total_margin = initial_funds + total_net_profit
+        total_return_rate = (total_net_profit / initial_funds * 100) if initial_funds > 0 else 0
+        
+        # 构建利润摘要
+        profit_summary = {
+            'total_net_profit': total_net_profit,
+            'initial_funds': initial_funds,
+            'total_margin': total_margin,
+            'total_return_rate': total_return_rate
+        }
+        
+        # 兼容其他字段
+        for k in ['yearly_return_rate', 'yearly_return_profit', 'round_net_profit', 'round_return_rate']:
+            if existing_data and 'profit_summary' in existing_data and k in existing_data['profit_summary']:
+                profit_summary[k] = existing_data['profit_summary'][k]
+        
+        self.arbitrage_data['profit_summary'] = profit_summary
+        
+        # 简化打印：只保留关键统计
+        symbols = [record.get('symbol', 'UNKNOWN') for record in unique_new_records]
+        symbol_summary = ','.join(symbols[:5])
+        if len(symbols) > 5:
+            symbol_summary += f" 等{len(symbols)}个"
+        if not symbol_summary:
+            symbol_summary = '无新增交易'
+
+        print(
+            f"套利更新 | 收到:{len(new_records)} 新增:{added_records} 重复:{duplicate_records} "
+            f"新增净收益:{new_profit:.4f}USDT"
+        )
+        print(
+            f"套利汇总 | 交易对:{symbol_summary} 总盈利:{total_net_profit:.4f}USDT "
+            f"总保证金:{total_margin:.4f}USDT 收益率:{total_return_rate:.6f}%"
+        )
+        
         self.update_global_data()
         save_arbitrage_data(self.arbitrage_data)
     
@@ -611,6 +656,7 @@ class DataStorage:
     def get_all_data(self):
         return {
             'tradingview': self.tradingview_data,
+            'tradingview_rounds': self.tradingview_rounds,
             'tradingview_summary': self.tradingview_summary,
             'arbitrage': self.arbitrage_data,
             'total_profit': self.total_profit_data,
@@ -635,12 +681,12 @@ btc_price_thread.start()
 # WebSocket事件处理
 @socketio.on('connect')
 def handle_connect():
-    print('Client connected')
+    # print('Client connected')
     socketio.emit('all_data', data_storage.get_all_data())
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print('Client disconnected')
+    pass
 
 # API端点
 @app.route('/api/update_tradingview', methods=['POST'])
@@ -747,4 +793,32 @@ def serve_static_file(filename):
     return send_from_directory(static_dir, filename)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    class FilteredStderr:
+        def __init__(self, wrapped):
+            self.wrapped = wrapped
+
+        def write(self, message):
+            if not message:
+                return
+
+            if 'Bad request version' in message:
+                return
+            if 'code 400, message' in message:
+                return
+
+            # 过滤含有控制字符的异常协议噪音行
+            has_ctrl = any((ord(ch) < 32 and ch not in '\r\n\t') for ch in message)
+            if has_ctrl:
+                return
+
+            self.wrapped.write(message)
+
+        def flush(self):
+            self.wrapped.flush()
+
+    # 降低普通请求日志级别，并屏蔽异常协议扫描噪音
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+    app.logger.disabled = True
+    sys.stderr = FilteredStderr(sys.stderr)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=False, log_output=False)
