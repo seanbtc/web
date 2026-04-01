@@ -436,131 +436,128 @@ class DataStorage:
         })
     
     def update_arbitrage_data(self, data):
-        # 处理套利策略启动时间
+        """更新套利数据：只以唯一订单的 net_profit 作为总额计算来源。"""
         arbitrage_data_file = os.path.join(data_dir, 'arbitrage_trades.json')
-        existing_data = None
+        existing_data = {}
         if os.path.exists(arbitrage_data_file):
             try:
                 with open(arbitrage_data_file, 'r', encoding='utf-8') as f:
                     existing_data = json.load(f)
             except Exception as e:
                 print(f"⚠️ 读取套利策略数据文件异常：{e}")
-        
-        # 处理start_time
-        if 'start_time' in data:
-            if existing_data and 'start_time' in existing_data:
-                self.arbitrage_start_time = existing_data['start_time']
-                print(f"✅ 套利策略已存在起始时间：{self.arbitrage_start_time}")
-            else:
-                self.arbitrage_start_time = data['start_time']
-                if existing_data is not None:
-                    existing_data['start_time'] = self.arbitrage_start_time
-                    try:
-                        with open(arbitrage_data_file, 'w', encoding='utf-8') as f:
-                            json.dump(existing_data, f, ensure_ascii=False, indent=2)
-                        print(f"✅ 套利策略起始时间已添加：{self.arbitrage_start_time}")
-                    except Exception as e:
-                        print(f"⚠️ 保存套利策略起始时间异常：{e}")
-        
-        # 处理交易记录和利润计算
+
         def to_float(value, default=0.0):
             try:
                 return float(value)
             except (TypeError, ValueError):
                 return default
 
-        trade_details = data.get('trade_details', [])
-        new_records = []
-        for detail in trade_details:
+        def build_record(detail):
             symbol = detail.get('symbol', 'UNKNOWN')
-            close_time = detail.get('close_time_cn', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            close_order_id = detail.get('close_order_id')
+            close_time = detail.get('close_time_cn') or detail.get('timestamp') or datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            close_order_id = detail.get('close_order_id') or detail.get('order_id')
             order_id = str(close_order_id) if close_order_id else f"{symbol}_{close_time}"
-            record = {
+            return {
                 'symbol': symbol,
                 'open_side': detail.get('open_side', 'SELL'),
-                'quantity': to_float(detail.get('open_executed_qty', 0)),
-                'open_price': to_float(detail.get('open_avg_price', 0)),
-                'close_price': to_float(detail.get('close_avg_price', 0)),
+                'quantity': to_float(detail.get('open_executed_qty', detail.get('quantity', 0))),
+                'open_price': to_float(detail.get('open_avg_price', detail.get('open_price', 0))),
+                'close_price': to_float(detail.get('close_avg_price', detail.get('close_price', 0))),
                 'net_profit': to_float(detail.get('net_profit', 0)),
                 'timestamp': close_time,
                 'order_id': order_id
             }
-            new_records.append(record)
-        
-        # 去重处理：根据订单ID作为唯一标识符
+
+        if not isinstance(self.arbitrage_data, dict):
+            self.arbitrage_data = {}
+        self.arbitrage_data.setdefault('trade_records', [])
+        self.arbitrage_data.setdefault('profit_summary', {})
+
+        # 启动时间只保留首次有效值，避免后续请求覆盖
+        self.arbitrage_start_time = (
+            existing_data.get('start_time')
+            or self.arbitrage_data.get('start_time')
+            or data.get('start_time')
+        )
+        if self.arbitrage_start_time:
+            self.arbitrage_data['start_time'] = self.arbitrage_start_time
+
+        incoming_summary = data.get('profit_summary', {}) if isinstance(data.get('profit_summary'), dict) else {}
+        current_summary = self.arbitrage_data.get('profit_summary', {}) if isinstance(self.arbitrage_data.get('profit_summary'), dict) else {}
+        existing_summary = existing_data.get('profit_summary', {}) if isinstance(existing_data.get('profit_summary'), dict) else {}
+
+        # 初始资金优先使用本地已填写值，其次才使用请求中的值
+        initial_funds = to_float(
+            existing_summary.get(
+                'initial_funds',
+                current_summary.get('initial_funds', incoming_summary.get('initial_funds', 500.0))
+            ),
+            500.0
+        )
+
+        # 先规范化已有记录并按 order_id 去重
+        normalized_records = []
+        existing_ids = set()
+        for record in self.arbitrage_data.get('trade_records', []):
+            normalized = build_record(record)
+            if normalized['order_id'] in existing_ids:
+                continue
+            existing_ids.add(normalized['order_id'])
+            normalized_records.append(normalized)
+        self.arbitrage_data['trade_records'] = normalized_records
+
+        # 只接收订单明细，汇总完全由订单 net_profit 自动重算
+        incoming_records = data.get('trade_details') or data.get('trade_records') or []
         added_records = 0
         duplicate_records = 0
-        unique_new_records = []
-        if new_records:
-            existing_ids = set()
-            for record in self.arbitrage_data['trade_records']:
-                if 'order_id' in record:
-                    existing_ids.add(record['order_id'])
-                else:
-                    record_id = f"{record.get('symbol', '')}_{record.get('timestamp', '')}_{record.get('open_price', '')}_{record.get('close_price', '')}_{record.get('net_profit', '')}_{record.get('quantity', '')}"
-                    existing_ids.add(record_id)
-            unique_new_records = [record for record in new_records if record['order_id'] not in existing_ids]
-            duplicate_records = len(new_records) - len(unique_new_records)
-            if unique_new_records:
-                self.arbitrage_data['trade_records'].extend(unique_new_records)
-                added_records = len(unique_new_records)
-                if len(self.arbitrage_data['trade_records']) > 100:
-                    self.arbitrage_data['trade_records'] = self.arbitrage_data['trade_records'][-100:]
+        added_symbols = []
 
-        # 只累计去重后的新增交易利润，避免重复请求导致利润重复计算
-        new_profit = sum(record.get('net_profit', 0.0) for record in unique_new_records)
-        
-        # 计算之前的总盈利
-        previous_total_profit = self.arbitrage_data['profit_summary'].get('total_net_profit', 0.0)
-        
-        # 计算总利润：如果有新添加的记录，使用之前的总盈利加上新交易的盈利；否则使用之前的总盈利
-        if added_records > 0:
-            total_net_profit = previous_total_profit + new_profit
-        else:
-            total_net_profit = previous_total_profit
-        
-        # 获取手动填写的初始资金
-        initial_funds = 500.0  # 默认值
-        if existing_data and 'profit_summary' in existing_data:
-            initial_funds = existing_data['profit_summary'].get('initial_funds', 500.0)
-        
-        # 计算总保证金和总收益率
+        for detail in incoming_records:
+            record = build_record(detail)
+            if record['order_id'] in existing_ids:
+                duplicate_records += 1
+                continue
+            existing_ids.add(record['order_id'])
+            self.arbitrage_data['trade_records'].append(record)
+            added_records += 1
+            added_symbols.append(record['symbol'])
+
+        total_net_profit = sum(to_float(record.get('net_profit', 0.0)) for record in self.arbitrage_data['trade_records'])
         total_margin = initial_funds + total_net_profit
-        total_return_rate = (total_net_profit / initial_funds * 100) if initial_funds > 0 else 0
-        
-        # 构建利润摘要
-        profit_summary = {
-            'total_net_profit': total_net_profit,
-            'initial_funds': initial_funds,
-            'total_margin': total_margin,
-            'total_return_rate': total_return_rate
-        }
-        
-        # 兼容其他字段
-        for k in ['yearly_return_rate', 'yearly_return_profit', 'round_net_profit', 'round_return_rate']:
-            if existing_data and 'profit_summary' in existing_data and k in existing_data['profit_summary']:
-                profit_summary[k] = existing_data['profit_summary'][k]
-        
-        self.arbitrage_data['profit_summary'] = profit_summary
-        
-        # 简化打印：只保留关键统计
-        symbols = [record.get('symbol', 'UNKNOWN') for record in unique_new_records]
-        symbol_summary = ','.join(symbols[:5])
-        if len(symbols) > 5:
-            symbol_summary += f" 等{len(symbols)}个"
-        if not symbol_summary:
-            symbol_summary = '无新增交易'
+        total_return_rate = (total_net_profit / initial_funds * 100) if initial_funds > 0 else 0.0
 
+        profit_summary = {
+            'total_net_profit': round(total_net_profit, 4),
+            'initial_funds': initial_funds,
+            'total_margin': round(total_margin, 4),
+            'total_return_rate': round(total_return_rate, 6)
+        }
+
+        # 非核心扩展字段只做透传，不参与总额计算
+        for key in ['yearly_return_rate', 'yearly_return_profit', 'round_net_profit', 'round_return_rate']:
+            if key in incoming_summary:
+                profit_summary[key] = incoming_summary[key]
+            elif key in current_summary:
+                profit_summary[key] = current_summary[key]
+            elif key in existing_summary:
+                profit_summary[key] = existing_summary[key]
+
+        self.arbitrage_data['profit_summary'] = profit_summary
+
+        symbol_summary = ','.join(added_symbols[:5]) if added_symbols else '无新增交易'
+        if len(added_symbols) > 5:
+            symbol_summary += f" 等{len(added_symbols)}个"
+
+        new_profit = sum(to_float(record.get('net_profit', 0.0)) for record in self.arbitrage_data['trade_records'][-added_records:]) if added_records > 0 else 0.0
         print(
-            f"套利更新 | 收到:{len(new_records)} 新增:{added_records} 重复:{duplicate_records} "
+            f"套利更新 | 收到:{len(incoming_records)} 新增:{added_records} 重复:{duplicate_records} "
             f"新增净收益:{new_profit:.4f}USDT"
         )
         print(
             f"套利汇总 | 交易对:{symbol_summary} 总盈利:{total_net_profit:.4f}USDT "
             f"总保证金:{total_margin:.4f}USDT 收益率:{total_return_rate:.6f}%"
         )
-        
+
         self.update_global_data()
         save_arbitrage_data(self.arbitrage_data)
     

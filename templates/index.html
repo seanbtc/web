@@ -160,6 +160,83 @@
             </div>
         </section>
 
+   <!-- 套利策略模块 -->
+        <section class="mb-12 bg-gray-100 rounded-xl p-6">
+            <div class="mb-6">
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                        <i class="fa fa-exchange text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-dark">套利策略</h3>
+                </div>
+                <p class="text-gray-600 mb-3">高频资金费率套利交易。</p>
+                <div class="flex items-center mb-4">
+                    <span class="text-xs font-medium text-gray-500 mr-2">状态:</span>
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold" id="arbitrage-status">运行</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <h4 class="text-lg font-semibold text-dark mb-4">本轮盈亏</h4>
+                <p class="text-gray-600 mb-3" id="arbitrage-start-time">2026年3月11日 至今</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">初始总资金</div>
+                        <div class="text-lg font-bold text-dark" id="arbitrage-initial-funds">$1000.00</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">累计净收益</div>
+                        <div class="text-lg font-bold text-green-600" id="arbitrage-total-net-profit">$0.00</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">累计总收益率</div>
+                        <div class="text-lg font-bold text-green-600" id="arbitrage-total-return-rate">0.00%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
+                <div class="table-container overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    时间
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    交易对
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    方向
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    价值($)
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    开仓价格
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    平仓价格
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    净收益
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="arbitrage-tbody">
+                            <tr>
+                                <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                                    <i class="fa fa-info-circle text-lg mb-1"></i>
+                                    <p>暂无交易记录</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- 4H多空策略模块 -->
         <section class="mb-12 bg-gray-100 rounded-xl p-6">
             <div class="mb-6">
@@ -167,9 +244,9 @@
                     <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                         <i class="fa fa-signal text-primary text-xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-dark">4H多空策略</h3>
+                    <h3 class="text-lg font-semibold text-dark">4H策略</h3>
                 </div>
-                <p class="text-gray-600 mb-3">趋势波段策略</p>
+                <p class="text-gray-600 mb-3">低频趋势波段交易。</p>
                 <div class="flex items-center mb-4">
                     <span class="text-xs font-medium text-gray-500 mr-2">状态:</span>
                     <span class="px-2 py-1 rounded-full text-xs font-semibold" id="tradingview-status">做空</span>
@@ -290,6 +367,91 @@
             </div>
         </section>
 
+        <!-- 现货策略模块 -->
+        <section class="mb-12 bg-gray-100 rounded-xl p-6">
+            <div class="mb-6">
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                        <i class="fa fa-shopping-cart text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-dark">现货策略</h3>
+                </div>
+                <p class="text-gray-600 mb-3">左侧抄底现货，牛顶卖出。</p>
+                <div class="flex items-center mb-4">
+                    <span class="text-xs font-medium text-gray-500 mr-2">状态:</span>
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold" id="spot-status">空仓</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-1">
+                    <h4 class="text-lg font-semibold text-dark mb-4">策略总盈亏</h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">收益</div>
+                            <div class="text-lg font-bold text-green-600" id="spot-total-profit">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-4">
+                    <h4 class="text-lg font-semibold text-dark mb-3">本轮持仓</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">当前仓位数量</div>
+                            <div class="text-md font-bold text-dark" id="spot-quantity"> BTC</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">当前仓位均价</div>
+                            <div class="text-md font-bold text-dark" id="spot-avg-price">$</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">浮盈</div>
+                            <div class="text-md font-bold" id="spot-float-profit">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
+                <div class="table-container overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    建仓时间
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    仓位
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    均价
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    是否平仓
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    平仓时间
+                                </th>
+                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    盈亏
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="spot-tbody">
+                            <tr>
+                                <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                                    <i class="fa fa-info-circle text-lg mb-1"></i>
+                                    <p>暂无交易记录</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- 摸顶抄底策略模块 -->
         <section class="mb-12 bg-gray-100 rounded-xl p-6">
             <div class="mb-6">
@@ -299,7 +461,7 @@
                     </div>
                     <h3 class="text-lg font-semibold text-dark">摸顶抄底策略</h3>
                 </div>
-                <p class="text-gray-600 mb-3">周期性操作，摸顶做空，抄底做多。</p>
+                <p class="text-gray-600 mb-3">右侧摸顶做空抄底做多。</p>
                 <div class="flex items-center mb-4">
                     <span class="text-xs font-medium text-gray-500 mr-2">状态:</span>
                     <span class="px-2 py-1 rounded-full text-xs font-semibold" id="top-bottom-status">摸顶做空</span>
@@ -382,168 +544,8 @@
             </div>
         </section>
 
-        <!-- 现货策略模块 -->
-        <section class="mb-12 bg-gray-100 rounded-xl p-6">
-            <div class="mb-6">
-                <div class="flex items-center mb-3">
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                        <i class="fa fa-shopping-cart text-purple-600 text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-dark">现货策略</h3>
-                </div>
-                <p class="text-gray-600 mb-3">现货市场交易策略，熊市买入牛市卖出。</p>
-                <div class="flex items-center mb-4">
-                    <span class="text-xs font-medium text-gray-500 mr-2">状态:</span>
-                    <span class="px-2 py-1 rounded-full text-xs font-semibold" id="spot-status">空仓</span>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
-                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-1">
-                    <h4 class="text-lg font-semibold text-dark mb-4">策略总盈亏</h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div class="bg-gray-50 rounded-lg p-3">
-                            <div class="text-xs text-gray-500 mb-1">收益</div>
-                            <div class="text-lg font-bold text-green-600" id="spot-total-profit">$0.00</div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="bg-white rounded-xl shadow-md p-6 md:col-span-4">
-                    <h4 class="text-lg font-semibold text-dark mb-3">本轮持仓</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        <div class="bg-gray-50 rounded-lg p-3">
-                            <div class="text-xs text-gray-500 mb-1">当前仓位数量</div>
-                            <div class="text-md font-bold text-dark" id="spot-quantity"> BTC</div>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-3">
-                            <div class="text-xs text-gray-500 mb-1">当前仓位均价</div>
-                            <div class="text-md font-bold text-dark" id="spot-avg-price">$</div>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-3">
-                            <div class="text-xs text-gray-500 mb-1">浮盈</div>
-                            <div class="text-md font-bold" id="spot-float-profit">$0.00</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
-                <div class="table-container overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    建仓时间
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    仓位
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    均价
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    是否平仓
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    平仓时间
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    盈亏
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200" id="spot-tbody">
-                            <tr>
-                                <td colspan="6" class="px-3 py-4 text-center text-gray-500">
-                                    <i class="fa fa-info-circle text-lg mb-1"></i>
-                                    <p>暂无交易记录</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 套利策略模块 -->
-        <section class="mb-12 bg-gray-100 rounded-xl p-6">
-            <div class="mb-6">
-                <div class="flex items-center mb-3">
-                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                        <i class="fa fa-exchange text-secondary text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-dark">套利策略</h3>
-                </div>
-                <p class="text-gray-600 mb-3">利用资金费率差异进行套利交易，尝试获取稳定收益。</p>
-                <div class="flex items-center mb-4">
-                    <span class="text-xs font-medium text-gray-500 mr-2">状态:</span>
-                    <span class="px-2 py-1 rounded-full text-xs font-semibold" id="arbitrage-status">运行</span>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                <h4 class="text-lg font-semibold text-dark mb-4">本轮盈亏</h4>
-                <p class="text-gray-600 mb-3" id="arbitrage-start-time">2026年3月11日 至今</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">初始总资金</div>
-                        <div class="text-lg font-bold text-dark" id="arbitrage-initial-funds">$1000.00</div>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">累计净收益</div>
-                        <div class="text-lg font-bold text-green-600" id="arbitrage-total-net-profit">$0.00</div>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">累计总收益率</div>
-                        <div class="text-lg font-bold text-green-600" id="arbitrage-total-return-rate">0.00%</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-dark mb-4">交易记录</h4>
-                <div class="table-container overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    时间
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    交易对
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    方向
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    价值($)
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    开仓价格
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    平仓价格
-                                </th>
-                                <th scope="col" class="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    净收益
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200" id="arbitrage-tbody">
-                            <tr>
-                                <td colspan="6" class="px-3 py-4 text-center text-gray-500">
-                                    <i class="fa fa-info-circle text-lg mb-1"></i>
-                                    <p>暂无交易记录</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
+     
          <!-- 交易报告 -->
         <section class="mb-12">
             <div class="bg-white rounded-xl shadow-md p-6">
